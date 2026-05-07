@@ -4,7 +4,7 @@
 [![Express](https://img.shields.io/badge/Framework-Express-lightgray.svg)](https://expressjs.com/)
 [![MySQL](https://img.shields.io/badge/Database-MySQL-blue.svg)](https://www.mysql.com/)
 
-[English (🇬🇧)](#english) | [العربية (🇸🇦)](#arabic)
+[English (🇬🇧)](#english) | [العربية (🇾🇪)](#arabic)
 
 ---
 
@@ -36,7 +36,7 @@ If you wish to work on the backend manually (without the Docker orchestrator):
 ---
 
 <a name="arabic"></a>
-## 🇸🇦 القراءة باللغة العربية (Arabic Documentation)
+## 🇾🇪 القراءة باللغة العربية (Arabic Documentation)
 
 مرحباً بك في خدمة الواجهة الخلفية (Backend) الخاصة بمنصة **My Party**. تم بناء هذا الخادم القوي ليعمل بواسطة **Node.js** وإطار عمل **Express.js**، حيث يتولى معالجة طلبات التطبيق (APIs)، المصادقة الآمنة (JWT)، حفظ المرفقات، والإشعارات الفورية عن طريق **Socket.io**.
 

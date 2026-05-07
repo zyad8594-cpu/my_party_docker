@@ -5,7 +5,7 @@
 [![Node.js](https://img.shields.io/badge/Backend-Node.js-green.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)](https://www.docker.com/)
 
-[English (🇬🇧)](#english) | [العربية (🇸🇦)](#arabic)
+[English (🇬🇧)](#english) | [العربية (🇾🇪)](#arabic)
 
 ---
 
@@ -150,7 +150,7 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 <a name="arabic"></a>
-## 🇸🇦 القراءة باللغة العربية (Arabic Documentation)
+## 🇾🇪 القراءة باللغة العربية (Arabic Documentation)
 
 مرحباً بك في **My Party**، المنصة الشاملة والحديثة المصممة لإحداث ثورة في إدارة الفعاليات والحفلات. يوفر هذا التطبيق أدوات قوية لتخطيط الفعاليات، إدارة الموردين، التعامل مع طلبات العملاء، وأكثر من ذلك بكثير، مع تقديم إشعارات لحظية (Real-time).
 

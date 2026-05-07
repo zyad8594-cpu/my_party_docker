@@ -3,7 +3,7 @@
 [![Flutter](https://img.shields.io/badge/Framework-Flutter-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Language-Dart-0175C2.svg)](https://dart.dev/)
 
-[English (🇬🇧)](#english) | [العربية (🇸🇦)](#arabic)
+[English (🇬🇧)](#english) | [العربية (🇾🇪)](#arabic)
 
 ---
 
@@ -35,7 +35,7 @@ If you prefer running the mobile app manually instead of using Docker:
 ---
 
 <a name="arabic"></a>
-## 🇸🇦 القراءة باللغة العربية (Arabic Documentation)
+## 🇾🇪 القراءة باللغة العربية (Arabic Documentation)
 
 مرحباً بك في الواجهة الأمامية (تطبيق الهاتف المحمول) والخاصة بمنصة **My Party**. تم تصميم وبناء هذا التطبيق بعناية فائقة باستخدام **Flutter** ليعمل بشكل سريع وسلس على أجهزة أندرويد و iOS والتكامل المباشر مع واجهات تطبيقات (REST APIs) الخاصة بنا و Socket.io لتحصل على إشعارات الفعاليات بشكل لحظي.
 
