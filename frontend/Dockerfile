@@ -5,55 +5,45 @@ FROM ubuntu:22.04
 ARG ANDROID_CMDLINE_TOOLS_VERSION=9477386
 ARG ANDROID_PLATFORM_VERSION=34
 ARG ANDROID_BUILD_TOOLS_VERSION=34.0.0
+ARG ANDROID_NDK_VERSION=28.2.13676358
 ARG FLUTTER_VERSION=3.41.0
 
 # مرآة APT (اتركها فارغة لاستخدام الافتراضية)
 ARG APT_MIRROR=mirrors.kernel.org
 
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV FLUTTER_HOME=/opt/flutter
+ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$FLUTTER_HOME/bin:$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/bin
+
+# نسخ المجلدات المحلية للمشروع (إن وجدت) للتحقق منها قبل التنزيل
+COPY packages/ /tmp/packages/
+
+# الوحدة 1: تثبيت أدوات النظام الأساسية ومكتبات الواجهة (مجمعة لتقليص الحجم)
 RUN if [ -n "$APT_MIRROR" ]; then \
         sed -i "s|http://archive.ubuntu.com|http://$APT_MIRROR|g" /etc/apt/sources.list && \
         sed -i "s|http://security.ubuntu.com|http://$APT_MIRROR|g" /etc/apt/sources.list; \
-    fi
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-# الوحدة 1: أدوات النظام الأساسية
-RUN apt-get update && apt-get install -y \
-    curl git wget unzip zip xz-utils \
-    && rm -rf /var/lib/apt/lists/*
-
-# الوحدة 2: بيئة الأندرويد الأساسية
-RUN apt-get update && apt-get install -y \
-    openjdk-21-jdk-headless adb udev libpulse0 \
-    && rm -rf /var/lib/apt/lists/*
-
-# الوحدة 3: أدوات بناء لينكس
-RUN apt-get update && apt-get install -y \
-    clang cmake ninja-build pkg-config \
-    && rm -rf /var/lib/apt/lists/*
-
-# الوحدة 4: مكتبات النظام والواجهة
-RUN apt-get update && apt-get install -y \
-    libgtk-3-dev liblzma-dev libglu1-mesa \
-    && rm -rf /var/lib/apt/lists/*
-
-# الوحدة 5: مكتبات الإضافات (GStreamer/Audio)
-RUN apt-get update && apt-get install -y \
-    libasound2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-    libsecret-1-dev libjsoncpp-dev libnm-dev libfontconfig1-dev libdbus-1-dev \
+    fi && \
+    apt-get update && \
+    # محاولة تثبيت أي حزم .deb محلية تم وضعها في packages/apt
+    if [ -d /tmp/packages/apt ] && [ "$(ls -A /tmp/packages/apt/*.deb 2>/dev/null)" ]; then \
+        echo "==> Installing local .deb packages..."; \
+        apt-get install -y /tmp/packages/apt/*.deb; \
+    fi && \
+    apt-get install -y --no-install-recommends \
+        curl git wget unzip zip xz-utils \
+        openjdk-21-jdk-headless adb udev libpulse0 \
+        clang cmake ninja-build pkg-config \
+        libgtk-3-dev liblzma-dev libglu1-mesa \
+        libasound2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+        libsecret-1-dev libjsoncpp-dev libnm-dev libfontconfig1-dev libdbus-1-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # إعداد Android SDK
-ENV ANDROID_SDK_ROOT=/opt/android-sdk
-ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
 
-
-# نسخ مجلد الحزم المحلية (إن وجد)
-COPY packages/ /tmp/packages/
-
-# تثبيت Android SDK Command-line Tools (محلي أو من الإنترنت)
-RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools && \
-    if ls /tmp/packages/commandlinetools-linux-*.zip 1>/dev/null 2>&1; then \
+# تثبيت Android SDK Command-line Tools
+RUN if ls /tmp/packages/commandlinetools-linux-*.zip 1>/dev/null 2>&1; then \
         echo "==> Using local Android commandline tools package"; \
         unzip -q /tmp/packages/commandlinetools-linux-*.zip -d $ANDROID_SDK_ROOT/cmdline-tools; \
     else \
@@ -62,18 +52,27 @@ RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools && \
         unzip -q /tmp/tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools && \
         rm /tmp/tools.zip; \
     fi && \
-    mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest && \
-    rm -rf /tmp/packages
+    mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
 
-# قبول رخص الأندرويد وتثبيت المنصة وأدوات البناء
+# قبول رخص الأندرويد وتثبيت المنصة وأدوات البناء والـ NDK
 RUN yes | sdkmanager --licenses && \
-    sdkmanager "platform-tools" "platforms;android-${ANDROID_PLATFORM_VERSION}" "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+    # التحقق من وجود NDK محلي
+    if ls /tmp/packages/android-ndk-*.zip 1>/dev/null 2>&1; then \
+        echo "==> Installing NDK from local zip..."; \
+        mkdir -p $ANDROID_SDK_ROOT/ndk && \
+        unzip -q /tmp/packages/android-ndk-*.zip -d $ANDROID_SDK_ROOT/ndk && \
+        # قد يحتاج المجلد لإعادة تسمية ليتناسب مع الإصدار المتوقع
+        NDK_DIR=$(find $ANDROID_SDK_ROOT/ndk -maxdepth 1 -type d -name "android-ndk-*" | head -n 1) && \
+        if [ -n "$NDK_DIR" ]; then mv "$NDK_DIR" "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION"; fi; \
+    else \
+        echo "==> Downloading SDK components and NDK from internet"; \
+        sdkmanager "platform-tools" \
+                   "platforms;android-${ANDROID_PLATFORM_VERSION}" \
+                   "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+                   "ndk;${ANDROID_NDK_VERSION}"; \
+    fi
 
-# نسخ مجلد الحزم المحلية مرة أخرى (ﻷنه حذفناه سابقًا) لاستخدامه مع Flutter
-COPY packages/ /tmp/packages/
-
-# تثبيت Flutter SDK (محلي أو من الإنترنت)
-ENV FLUTTER_HOME=/opt/flutter
+# تثبيت Flutter SDK
 RUN if [ -f /tmp/packages/flutter_linux_*-stable.tar.xz ]; then \
         echo "==> Using local Flutter SDK package"; \
         tar -xf /tmp/packages/flutter_linux_*-stable.tar.xz -C /opt; \
@@ -82,11 +81,12 @@ RUN if [ -f /tmp/packages/flutter_linux_*-stable.tar.xz ]; then \
         wget -q "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" -O /tmp/flutter.tar.xz && \
         tar -xf /tmp/flutter.tar.xz -C /opt && \
         rm /tmp/flutter.tar.xz; \
-    fi && \
-    rm -rf /tmp/packages
-ENV PATH=$PATH:$FLUTTER_HOME/bin
+    fi
 
-# إعدادات Git و Flutter الأولية (بدون تشغيل pub get هنا)
+# تنظيف الملفات المؤقتة
+RUN rm -rf /tmp/packages
+
+# إعدادات Git و Flutter الأولية
 RUN git config --global --add safe.directory /opt/flutter && \
     flutter config --no-analytics && \
     flutter doctor
@@ -94,8 +94,8 @@ RUN git config --global --add safe.directory /opt/flutter && \
 # مجلد العمل
 WORKDIR /app
 
-# نُسخ الملفات (سيتم استبدالها بالمجلد المرتبط، لكنها تسمح ببناء صورة مستقلة عند الحاجة)
+# نُسخ الملفات (ستتأثر بالـ Volume mount في docker-compose)
 COPY . .
 
-# أمر افتراضي: نقوم بتثبيت التبعيات لأن المجلد المرتبط قد لا يحتويها
-CMD ["/bin/bash", "-c", "flutter pub get && exec bash"]
+# أمر افتراضي: نقوم بتثبيت التبعيات وتشغيل التطبيق
+CMD ["/bin/bash", "/app/start.sh"]
