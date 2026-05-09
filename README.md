@@ -65,7 +65,7 @@ This method automates the building and starting of both backend and frontend via
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/my_party_docker.git
+   git clone https://github.com/zyad8594-cpu/my_party_docker.git
    cd my_party_docker
    ```
 
@@ -141,7 +141,7 @@ my_party_docker/
 ---
 
 ### 🤝 Contributing & License
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/my_party_docker/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/zyad8594-cpu/my_party_docker/issues).
 This project is licensed under the [MIT License](LICENSE).
 
 <br/>
@@ -150,7 +150,7 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 <a name="arabic"></a>
-## 🇾🇪 القراءة باللغة العربية (Arabic Documentation)
+## 🇾🇪 توثيق اللغة العربية
 
 مرحباً بك في **My Party**، المنصة الشاملة والحديثة المصممة لإحداث ثورة في إدارة الفعاليات والحفلات. يوفر هذا التطبيق أدوات قوية لتخطيط الفعاليات، إدارة الموردين، التعامل مع طلبات العملاء، وأكثر من ذلك بكثير، مع تقديم إشعارات لحظية (Real-time).
 
@@ -205,7 +205,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 1. **نسخ المستودع (Clone):**
    ```bash
-   git clone https://github.com/your-username/my_party_docker.git
+   git clone https://github.com/zyad8594-cpu/my_party_docker.git
    cd my_party_docker
    ```
 
@@ -282,6 +282,6 @@ my_party_docker/
 
 ### 🤝 المساهمة والترخيص
 نرحب دوماً بجميع المساهمات برمجياً، الإبلاغ عن المشاكل، أو طلب إضافة مميزات جديدة! 
-لا تتردد في التحقق من [صفحة القضايا (Issues)](https://github.com/your-username/my_party_docker/issues).
+لا تتردد في التحقق من [صفحة القضايا (Issues)](https://github.com/zyad8594-cpu/my_party_docker/issues).
 
 هذا المشروع مرخص بموجب ترخيص [MIT License](LICENSE).
